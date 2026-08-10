@@ -1,3 +1,7 @@
+Yes. The reason it is not appearing correctly is that **Markdown formatting is sensitive to blank lines, indentation, and fenced code blocks**. In particular, the content after ````text` can get mixed with the surrounding Markdown if the fence is not separated cleanly.
+
+For GitHub, the safest approach is to copy the **entire README below as one single block** and paste it directly into `README.md`.
+
 ````markdown
 # 📧 AI Gmail Assistant
 
@@ -32,436 +36,438 @@ The user communicates with the application using natural language.
 For example:
 
 ```text
-User:
-Find unread emails from HDFC Bank.
+User: Find unread emails from HDFC Bank.
 ````
 
-The AI agent determines that it needs to use the Gmail search tool and generates a Gmail query such as:
-
-```text
-from:hdfcbank is:unread
-```
-
-The Gmail API retrieves the matching emails.
-
-The agent then processes the results and provides a natural-language response.
+The AI agent understands the user's request, selects the appropriate Gmail tool, retrieves the required emails, analyzes the results, and returns a natural-language response.
 
 ---
 
-# 🎯 Business Requirement
-
-The objective is to build an AI assistant that can help users manage large volumes of emails efficiently.
-
-The assistant should be able to:
-
-1. Connect securely to Gmail.
-2. Retrieve Gmail account information.
-3. Count unread emails.
-4. Retrieve recent emails.
-5. Search emails using Gmail search operators.
-6. Read complete email content.
-7. Summarize emails.
-8. Summarize multiple unread emails.
-9. Identify action items.
-10. Identify deadlines and meetings.
-11. Prioritize important actions.
-12. Maintain conversation context.
-13. Allow users to start a new conversation.
-14. Provide a simple user interface.
-15. Allow an LLM agent to decide which Gmail tool should be executed.
-
----
-
-# 🏗️ High-Level Architecture
+# 🏗️ Project Architecture
 
 ```text
-                         ┌──────────────────────────┐
-                         │        User              │
-                         │                          │
-                         │ Natural Language Query   │
-                         └────────────┬─────────────┘
-                                      │
-                                      ▼
-                         ┌──────────────────────────┐
-                         │      Streamlit UI        │
-                         │                          │
-                         │ Chat Interface           │
-                         │ Quick Actions            │
-                         │ Gmail Account Info       │
-                         └────────────┬─────────────┘
-                                      │
-                                      ▼
-                         ┌──────────────────────────┐
-                         │       LangGraph          │
-                         │     Agent Workflow       │
-                         │                          │
-                         │  Chatbot Node            │
-                         │        │                 │
-                         │        ▼                 │
-                         │   Tool Decision          │
-                         │        │                 │
-                         │        ▼                 │
-                         │    Tool Node             │
-                         └────────────┬─────────────┘
-                                      │
-                     ┌────────────────┼────────────────┐
-                     │                │                │
-                     ▼                ▼                ▼
-              Gmail Tools       Analysis Tools    Search Tools
-                     │                │                │
-                     └────────────────┼────────────────┘
-                                      │
-                                      ▼
-                         ┌──────────────────────────┐
-                         │      Gmail Service       │
-                         │                          │
-                         │ Gmail API                │
-                         │ OAuth Authentication     │
-                         │ Email Retrieval          │
-                         │ Search                   │
-                         └────────────┬─────────────┘
-                                      │
-                                      ▼
-                         ┌──────────────────────────┐
-                         │       Gmail API          │
-                         │                          │
-                         │ Inbox                    │
-                         │ Messages                 │
-                         │ Threads                  │
-                         └──────────────────────────┘
-
-
-                         ┌──────────────────────────┐
-                         │      OpenAI GPT-4o-mini  │
-                         │                          │
-                         │ Reasoning                │
-                         │ Tool Selection           │
-                         │ Summarization            │
-                         │ Email Analysis            │
-                         └──────────────────────────┘
+                         ┌───────────────────────┐
+                         │       User            │
+                         │                       │
+                         │ Natural Language Query│
+                         └───────────┬───────────┘
+                                     │
+                                     ▼
+                         ┌───────────────────────┐
+                         │     Streamlit UI      │
+                         │                       │
+                         │ Chat Interface        │
+                         │ Gmail Dashboard       │
+                         │ Quick Actions         │
+                         └───────────┬───────────┘
+                                     │
+                                     ▼
+                         ┌───────────────────────┐
+                         │      LangGraph        │
+                         │     Agent Workflow    │
+                         └───────────┬───────────┘
+                                     │
+                                     ▼
+                         ┌───────────────────────┐
+                         │      GPT-4o-mini      │
+                         │                       │
+                         │ Understands Query     │
+                         │ Selects Tools         │
+                         └───────────┬───────────┘
+                                     │
+                       ┌─────────────┴─────────────┐
+                       │                           │
+                       ▼                           ▼
+              ┌─────────────────┐        ┌─────────────────┐
+              │   Gmail Tools   │        │ Conversation    │
+              │                 │        │ Memory          │
+              │ Search Gmail    │        │                 │
+              │ Unread Count    │        │ Thread ID       │
+              │ Recent Emails   │        │ Checkpoints     │
+              │ Summarization   │        │                 │
+              │ Action Items    │        └─────────────────┘
+              │ Deadlines       │
+              └────────┬────────┘
+                       │
+                       ▼
+              ┌─────────────────┐
+              │    Gmail API    │
+              │                 │
+              │ Google OAuth 2  │
+              │ Gmail Messages  │
+              │ Gmail Metadata  │
+              └────────┬────────┘
+                       │
+                       ▼
+              ┌─────────────────┐
+              │   User Gmail    │
+              │     Inbox       │
+              └─────────────────┘
 ```
 
 ---
 
-# 🔄 End-to-End Request Flow
-
-The application follows the following flow:
+# 🔄 End-to-End Workflow
 
 ```text
-User Question
-     │
-     ▼
-Streamlit UI
-     │
-     ▼
+User
+  │
+  ▼
+Streamlit Chat UI
+  │
+  ▼
 LangGraph Agent
-     │
-     ▼
+  │
+  ▼
 GPT-4o-mini
-     │
-     ├── Direct Answer
-     │
-     └── Tool Required
-              │
-              ▼
-         Gmail Tool
-              │
-              ▼
-         Gmail Service
-              │
-              ▼
-          Gmail API
-              │
-              ▼
-         Email Results
-              │
-              ▼
-         GPT-4o-mini
-              │
-              ▼
-       Final Response
-              │
-              ▼
-        Streamlit UI
+  │
+  ├── Direct Answer
+  │
+  └── Tool Call
+        │
+        ▼
+   Gmail Tool
+        │
+        ▼
+     Gmail API
+        │
+        ▼
+     Gmail Inbox
+        │
+        ▼
+     Tool Result
+        │
+        ▼
+   GPT-4o-mini
+        │
+        ▼
+ Natural Language Response
+        │
+        ▼
+    Streamlit UI
 ```
 
 ---
 
 # 🧠 Agentic AI Architecture
 
-The core of the application is an Agentic AI workflow.
+The application uses an **LLM-driven tool-calling architecture**.
 
-The LLM is not restricted to answering questions directly.
+The LLM does not directly access Gmail.
 
-Instead, it can decide whether a tool is required.
+Instead, the LLM is connected to a set of controlled tools.
 
 For example:
 
 ```text
 User:
-How many unread emails do I have?
+"Find unread emails from Google"
+
+        ↓
+
+GPT-4o-mini
+
+        ↓
+
+Tool Selection
+
+        ↓
+
+search_gmail(
+    query="from:google is:unread"
+)
+
+        ↓
+
+Gmail API
+
+        ↓
+
+Email Results
+
+        ↓
+
+GPT-4o-mini
+
+        ↓
+
+Final Answer
 ```
 
-The LLM identifies:
-
-```text
-Tool Required:
-get_unread_email_count
-```
-
-The tool accesses Gmail.
-
-The result may be:
-
-```text
-You have 7 unread emails.
-```
-
-The result is returned to the LLM, which generates the final response.
+This architecture provides better control and separation of responsibilities.
 
 ---
 
-# 🔧 LangGraph Workflow
+# 🧩 Main Components
 
-The LangGraph workflow contains two primary nodes.
+## 1. Streamlit
 
-```text
-              START
-                │
-                ▼
-          ┌─────────────┐
-          │   Chatbot   │
-          │     Node    │
-          └──────┬──────┘
-                 │
-                 ▼
-          Tool Required?
-             /       \
-           No         Yes
-           │           │
-           ▼           ▼
-          END      ┌─────────┐
-                   │  Tools  │
-                   │   Node  │
-                   └────┬────┘
-                        │
-                        ▼
-                    Chatbot
-                        │
-                        ▼
-                       END
-```
+Streamlit provides the user interface.
 
-The workflow uses:
+Responsibilities include:
+
+* Gmail account information
+* Gmail connection status
+* Unread email count
+* Total email count
+* Thread count
+* Quick actions
+* Chat interface
+* Conversation history
+* New conversation functionality
+
+---
+
+## 2. GPT-4o-mini
+
+GPT-4o-mini acts as the reasoning and language-generation component.
+
+It is responsible for:
+
+* Understanding user questions
+* Selecting appropriate tools
+* Generating tool-call arguments
+* Summarizing emails
+* Extracting action items
+* Identifying deadlines
+* Identifying meetings
+* Generating natural-language responses
+
+---
+
+## 3. LangChain
+
+LangChain is used to:
+
+* Integrate the LLM
+* Define tools
+* Bind tools to the model
+* Manage messages
+* Create reusable AI components
+
+Example:
 
 ```python
-StateGraph
-START
-END
-ToolNode
-tools_condition
+agent = llm.bind_tools(TOOLS)
 ```
 
-This enables the agent to dynamically select and execute Gmail tools.
+---
+
+## 4. LangGraph
+
+LangGraph manages the agent workflow.
+
+The workflow contains:
+
+```text
+START
+  ↓
+Chatbot
+  ↓
+Tool Decision
+  ↓
+Tools
+  ↓
+Chatbot
+  ↓
+END
+```
+
+This enables the agent to perform multiple tool calls when required.
 
 ---
 
 # 🛠️ Gmail Tools
 
-The application exposes Gmail functionality to the LangGraph agent through LangChain tools.
+The project provides several Gmail tools.
 
-Current tools include:
-
-### 1. Get Unread Email Count
+### Unread Email Count
 
 ```text
 get_unread_email_count()
 ```
 
+Returns the number of unread emails.
+
 Example:
 
 ```text
-User:
-How many unread emails do I have?
+User: How many unread emails do I have?
 ```
 
 ---
 
-### 2. Get Recent Emails
+### Recent Emails
 
 ```text
 get_recent_emails()
 ```
 
-Example:
+Returns recent emails with information such as:
 
-```text
-User:
-Show my latest emails.
-```
+* Sender
+* Subject
+* Date
 
 ---
 
-### 3. Summarize Latest Email
+### Latest Email Summary
 
 ```text
 summarize_latest_email()
 ```
 
-Example:
+Uses GPT-4o-mini to summarize the latest email.
 
-```text
-User:
-Summarize my latest email.
-```
+The summary includes:
+
+* Sender
+* Subject
+* Main purpose
+* Important dates
+* Action items
 
 ---
 
-### 4. Summarize Unread Emails
+### Unread Email Summarization
 
 ```text
 summarize_unread_emails()
 ```
 
-Example:
-
-```text
-User:
-Summarize my unread emails.
-```
+Retrieves unread emails and generates summaries.
 
 ---
 
-### 5. Gmail Search
+### Gmail Search
 
 ```text
 search_gmail(query)
 ```
 
-This supports Gmail search operators.
+Supports Gmail search operators.
 
 Examples:
 
 ```text
 from:google
-```
-
-```text
 from:hdfcbank
-```
-
-```text
 subject:invoice
-```
-
-```text
 has:attachment
-```
-
-```text
 is:unread
-```
-
-```text
 newer_than:1d
 ```
 
+Users can therefore perform advanced Gmail searches.
+
 ---
 
-### 6. Extract Action Items
+### Action Item Extraction
 
 ```text
 extract_action_items()
 ```
 
-The tool analyzes emails and identifies tasks that require user action.
+Analyzes emails and identifies tasks that require user action.
 
 Example output:
 
 ```text
 ACTION ITEMS
 
-1. Action: Complete a short form to indicate job preferences
+1. Complete a short form to indicate job preferences
    Sender: IBM Talent Acquisition
    Priority: Medium
 
-2. Action: Review the personal loan offer
+2. Take action on the personal loan offer
    Sender: HDFC Bank
    Priority: High
 ```
 
 ---
 
-### 7. Extract Deadlines and Meetings
+### Deadline and Meeting Extraction
 
 ```text
 extract_deadlines_and_meetings()
 ```
 
-This analyzes email content to identify:
+Analyzes emails to identify:
 
-* Meetings
 * Deadlines
+* Meetings
 * Important dates
-* Time-sensitive activities
+* Events
 
 ---
 
-# 🔎 Advanced Gmail Search
+# 🔍 Advanced Gmail Search
 
-The assistant supports Gmail search operators.
+The application supports natural-language Gmail searching.
 
-Examples:
-
-```text
-from:google
-```
-
-Find emails from Google.
+For example:
 
 ```text
-from:hdfcbank
+Find unread emails from Google.
 ```
 
-Find emails from HDFC Bank.
+The agent can translate this into:
 
 ```text
-subject:invoice
+from:google is:unread
 ```
 
-Find emails containing "invoice" in the subject.
+Another example:
 
 ```text
-has:attachment
+Show emails from HDFC Bank containing loan offers.
 ```
 
-Find emails containing attachments.
+The agent can construct an appropriate Gmail search query and call the Gmail API.
+
+---
+
+# 🧠 Conversation Memory
+
+The application supports conversation-level memory using LangGraph checkpointing.
+
+Each conversation receives a unique:
 
 ```text
-is:unread
+thread_id
 ```
-
-Find unread emails.
-
-```text
-newer_than:7d
-```
-
-Find emails from the last seven days.
-
-Multiple operators can also be combined.
 
 Example:
 
 ```text
-from:hdfcbank is:unread
+thread_id = "550e8400-e29b-41d4-a716-446655440000"
 ```
+
+This allows the application to maintain conversation state.
+
+Example:
+
+```text
+User:
+Find emails from HDFC Bank.
+
+Assistant:
+I found several HDFC Bank emails.
+
+User:
+Which ones are high priority?
+
+Assistant:
+Based on the HDFC Bank emails I found earlier...
+```
+
+The second question can use the context maintained by the conversation thread.
 
 ---
 
 # 🔐 Gmail Authentication
 
-The application uses the Gmail API with OAuth 2.0.
+The application uses the **Gmail API with OAuth 2.0**.
 
 Authentication flow:
 
@@ -475,7 +481,7 @@ Google OAuth
 User Login
      │
      ▼
-Permission Approval
+Permission Grant
      │
      ▼
 Access Token
@@ -484,169 +490,18 @@ Access Token
 Gmail API
 ```
 
-OAuth files are stored locally under:
+Sensitive OAuth files are excluded from Git using `.gitignore`.
+
+Examples:
 
 ```text
 credentials/
-```
-
-The following files are intentionally excluded from Git:
-
-```text
 credentials.json
 token.json
+token.pickle
 ```
 
-They are included in `.gitignore` to prevent sensitive authentication information from being committed to GitHub.
-
----
-
-# 🤖 LLM Configuration
-
-The project uses:
-
-```text
-OpenAI GPT-4o-mini
-```
-
-The LLM is initialized through:
-
-```text
-models/llm.py
-```
-
-The model is configured with:
-
-```python
-ChatOpenAI(
-    model="gpt-4o-mini",
-    temperature=0
-)
-```
-
-Temperature is set to `0` to provide more deterministic responses for email-related operations.
-
-The API key is retrieved from:
-
-```text
-OPENAI_API_KEY
-```
-
----
-
-# 🧩 Conversation Memory
-
-The application supports conversation memory using LangGraph checkpointing.
-
-Each conversation receives a unique:
-
-```text
-thread_id
-```
-
-Example:
-
-```text
-550e8400-e29b-41d4-a716-446655440000
-```
-
-The thread ID allows the LangGraph workflow to maintain conversation state.
-
-Example:
-
-```text
-User:
-Find my HDFC emails.
-
-Assistant:
-I found several HDFC emails.
-
-User:
-Which of those are high priority?
-
-Assistant:
-The high-priority emails are...
-```
-
-The second question can use the context established during the conversation.
-
----
-
-# 🆕 New Conversation
-
-The Streamlit application provides a:
-
-```text
-🆕 New Conversation
-```
-
-button.
-
-When clicked:
-
-1. A new thread ID is generated.
-2. Previous visible chat history is cleared.
-3. Pending quick actions are cleared.
-4. A new conversation starts.
-
----
-
-# 🖥️ Streamlit Interface
-
-The application provides:
-
-### Gmail Account Information
-
-The sidebar displays:
-
-```text
-Connected
-
-Email
-Unread Emails
-Total Emails
-Threads
-```
-
----
-
-### Quick Actions
-
-The sidebar contains:
-
-```text
-📬 Unread Count
-📩 Recent Emails
-📝 Summarize Latest
-```
-
-These buttons automatically send predefined questions to the LangGraph agent.
-
----
-
-### Chat Interface
-
-Users can enter natural-language questions such as:
-
-```text
-Find emails from Google.
-```
-
-```text
-Summarize my unread emails.
-```
-
-```text
-What action items do I have?
-```
-
-```text
-Are there any upcoming deadlines?
-```
-
-```text
-Find unread emails from HDFC Bank.
-```
+These files should **never be committed to GitHub**.
 
 ---
 
@@ -663,27 +518,22 @@ AI_Gmail_Assistant/
 │   └── state.py
 │
 ├── config/
-│   └── ...
 │
 ├── credentials/
 │   ├── credentials.json
 │   └── token.json
 │
 ├── images/
-│   └── ...
 │
 ├── mcp_server/
-│   └── ...
 │
 ├── models/
 │   ├── __init__.py
 │   └── llm.py
 │
 ├── prompts/
-│   └── ...
 │
 ├── schemas/
-│   └── ...
 │
 ├── services/
 │   ├── __init__.py
@@ -696,41 +546,15 @@ AI_Gmail_Assistant/
 │   └── gmail_tools.py
 │
 ├── utils/
-│   └── ...
 │
 ├── app.py
+│
 ├── requirements.txt
-├── README.md
+│
 ├── .gitignore
 │
-├── test_auth.py
-├── test_search.py
-├── test_search_tool.py
-├── test_search_full.py
-├── test_search_details.py
-├── test_agent_search.py
-├── test_agent_search_loop.py
-├── test_graph_search.py
-│
-├── test_summary.py
-├── test_unread_details.py
-├── test_unread_summary.py
-├── test_unread_tool.py
-│
-├── test_action_items.py
-├── test_action_tool.py
-├── test_deadlines.py
-├── test_deadlines_tool.py
-├── test_priority.py
-│
-├── test_email_analysis.py
-├── test_multi_tool.py
-├── test_memory.py
-├── test_graph_action_search.py
-└── test_graph_memory_action.py
+└── README.md
 ```
-
-> Note: `credentials/` exists locally but is excluded from version control using `.gitignore`.
 
 ---
 
@@ -738,60 +562,34 @@ AI_Gmail_Assistant/
 
 ## `agents/`
 
-Contains the Agentic AI and LangGraph workflow.
+Contains the LangGraph agent implementation.
 
-Important files:
+Main responsibilities:
 
-```text
-agent.py
-```
-
-Creates the LLM agent and binds Gmail tools.
-
-```text
-graph.py
-```
-
-Creates and compiles the LangGraph workflow.
-
-```text
-nodes.py
-```
-
-Contains LangGraph nodes.
-
-```text
-state.py
-```
-
-Defines the agent state.
+* Agent creation
+* LangGraph workflow
+* Graph nodes
+* Agent state
+* Tool routing
+* Conversation flow
 
 ---
 
 ## `services/`
 
-Contains Gmail and business logic.
+Contains business logic for Gmail operations.
 
-### `auth_service.py`
+Examples:
 
-Responsible for Gmail OAuth authentication.
-
-### `gmail_service.py`
-
-Responsible for:
-
-* Gmail API communication
-* Profile retrieval
-* Unread email retrieval
-* Recent email retrieval
-* Email search
-* Full email retrieval
-* Header extraction
-* Email body extraction
-
-### `summary_service.py`
-
-Responsible for using GPT-4o-mini to summarize email content.
+```text
+Gmail authentication
+Gmail profile
+Email retrieval
+Email searching
+Email body extraction
+Email analysis
+Email summarization
+```
 
 ---
 
@@ -799,11 +597,7 @@ Responsible for using GPT-4o-mini to summarize email content.
 
 Contains LangChain tools exposed to the AI agent.
 
-```text
-gmail_tools.py
-```
-
-Converts Gmail functionality into tools that the LLM can call.
+The LLM can select these tools based on the user's request.
 
 ---
 
@@ -811,225 +605,164 @@ Converts Gmail functionality into tools that the LLM can call.
 
 Contains LLM configuration.
 
-```text
-llm.py
-```
+The project currently uses:
 
-Creates the reusable GPT-4o-mini model instance.
+```text
+GPT-4o-mini
+```
 
 ---
 
 ## `mcp_server/`
 
-Contains MCP-related components for exposing or integrating Gmail capabilities through the Model Context Protocol.
+Contains the MCP-related implementation for extending the application with a Model Context Protocol based architecture.
 
 ---
 
 ## `prompts/`
 
-Contains reusable prompts used for email analysis and LLM processing.
+Contains reusable prompt templates.
 
 ---
 
 ## `schemas/`
 
-Contains structured data definitions used by the application.
+Contains structured data schemas used by the application.
 
 ---
 
-## `utils/`
+## `credentials/`
 
-Contains reusable utility functionality such as logging and helper functions.
+Contains local Google OAuth credentials.
 
----
-
-# 🧪 Testing Strategy
-
-The project follows incremental testing.
-
-Individual components were tested before integrating them into LangGraph and Streamlit.
+This folder must remain excluded from Git.
 
 ---
 
-## Authentication Testing
+# 🧪 Testing
 
-```bash
-python test_auth.py
-```
+The project contains multiple test scripts for validating individual components.
 
-Validates Gmail OAuth authentication.
-
----
-
-## Gmail Search Testing
-
-```bash
-python test_search.py
-```
-
-Tests Gmail search functionality.
-
----
-
-## Gmail Search Tool Testing
-
-```bash
-python test_search_tool.py
-```
-
-Tests the LangChain Gmail search tool.
-
----
-
-## Full Email Search Testing
-
-```bash
-python test_search_full.py
-```
-
-Tests retrieval of complete email content.
-
----
-
-## Agent Search Testing
-
-```bash
-python test_agent_search.py
-```
-
-Tests whether the LLM correctly identifies and calls the Gmail search tool.
-
----
-
-## Agent Search Loop Testing
-
-```bash
-python test_agent_search_loop.py
-```
-
-Tests the complete:
+Examples:
 
 ```text
-LLM → Tool → Result → LLM
+test_auth.py
+test_search.py
+test_search_tool.py
+test_search_full.py
+test_agent.py
+test_agent_search.py
+test_agent_search_loop.py
+test_graph_search.py
+test_action_items.py
+test_action_tool.py
+test_deadlines.py
+test_deadlines_tool.py
+test_memory.py
+test_graph_memory_action.py
 ```
 
-cycle.
+Testing is performed at multiple levels:
+
+```text
+Unit Testing
+     ↓
+Service Testing
+     ↓
+Tool Testing
+     ↓
+Agent Testing
+     ↓
+LangGraph Testing
+     ↓
+Streamlit UI Testing
+```
 
 ---
 
-## LangGraph Search Testing
+# 🧪 Example Test Flow
 
-```bash
-python test_graph_search.py
+## Gmail Service
+
+```text
+test_search.py
+       ↓
+GmailService
+       ↓
+Gmail API
 ```
 
-Tests the Gmail search capability through the LangGraph workflow.
+## Gmail Tool
 
----
-
-## Action Item Testing
-
-```bash
-python test_action_items.py
+```text
+test_search_tool.py
+       ↓
+search_gmail()
+       ↓
+GmailService
 ```
 
-Tests action-item extraction.
+## Agent
 
----
-
-## Action Tool Testing
-
-```bash
-python test_action_tool.py
+```text
+test_agent_search.py
+       ↓
+GPT-4o-mini
+       ↓
+search_gmail tool
 ```
 
-Tests the action-item LangChain tool.
+## LangGraph
 
----
-
-## Deadline Testing
-
-```bash
-python test_deadlines.py
+```text
+test_graph_search.py
+       ↓
+LangGraph
+       ↓
+Agent
+       ↓
+Tools
+       ↓
+Gmail API
 ```
-
-Tests deadline and meeting extraction.
-
----
-
-## Deadline Tool Testing
-
-```bash
-python test_deadlines_tool.py
-```
-
-Tests the deadline/meeting LangChain tool.
-
----
-
-## Memory Testing
-
-```bash
-python test_memory.py
-```
-
-Tests LangGraph conversation memory.
-
----
-
-## Graph Memory Testing
-
-```bash
-python test_graph_memory_action.py
-```
-
-Tests memory together with Gmail analysis and action-item processing.
 
 ---
 
 # ⚙️ Installation
 
-## 1. Clone the Repository
+Clone the repository:
 
 ```bash
 git clone <YOUR_GITHUB_REPOSITORY_URL>
 ```
 
-Navigate into the project:
+Navigate to the project:
 
 ```bash
 cd AI_Gmail_Assistant
 ```
 
----
-
-# 🐍 Create Virtual Environment
-
-Windows:
+Create a virtual environment:
 
 ```bash
 python -m venv gmail_ai_agent
 ```
 
-Activate it:
+Activate the environment on Windows:
 
-```bash
+```powershell
 gmail_ai_agent\Scripts\activate
 ```
 
----
-
-# 📦 Install Dependencies
-
-Install the project dependencies:
+Install dependencies:
 
 ```bash
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ---
 
-# 🔑 Configure OpenAI API Key
+# 🔑 Environment Configuration
 
 Set the OpenAI API key as an environment variable.
 
@@ -1039,94 +772,78 @@ Windows PowerShell:
 $env:OPENAI_API_KEY="your-api-key"
 ```
 
-Alternatively, configure it permanently through Windows Environment Variables.
+Alternatively, use a `.env` file if the project configuration loads environment variables through `python-dotenv`.
 
-Do not commit API keys to GitHub.
-
----
-
-# 🔐 Configure Gmail API
-
-Create a Google Cloud project and enable the Gmail API.
-
-Create OAuth credentials for a desktop application.
-
-Download the OAuth credentials file and place it locally as:
-
-```text
-credentials/credentials.json
-```
-
-Run:
-
-```bash
-python test_auth.py
-```
-
-Complete the Google OAuth authentication flow.
-
-The application will create:
-
-```text
-credentials/token.json
-```
-
-The credentials directory must remain excluded from Git.
+Never commit API keys to GitHub.
 
 ---
 
-# ▶️ Run the Application
+# 🔐 Google Gmail API Setup
 
-Use Streamlit:
+The application requires Gmail API access.
 
-```bash
-python -m streamlit run app.py
+High-level setup:
+
+```text
+Google Cloud Console
+        ↓
+Create / Select Project
+        ↓
+Enable Gmail API
+        ↓
+Configure OAuth Consent Screen
+        ↓
+Create OAuth Client
+        ↓
+Download credentials.json
+        ↓
+Place inside credentials/
+        ↓
+Run application
+        ↓
+Complete Google OAuth login
 ```
 
-or:
+The generated OAuth token is stored locally and excluded from Git.
 
-```bash
+---
+
+# ▶️ Running the Application
+
+Activate the virtual environment:
+
+```powershell
+gmail_ai_agent\Scripts\activate
+```
+
+Run Streamlit:
+
+```powershell
 streamlit run app.py
 ```
 
-If `streamlit` is not recognized on Windows, use:
-
-```bash
-python -m streamlit run app.py
-```
-
-This ensures Streamlit is executed from the active Python environment.
+The application will open in the browser.
 
 ---
 
 # 💬 Example Questions
 
-After starting the application, users can ask:
-
-### Basic Gmail Questions
+Once the application is running, users can ask:
 
 ```text
 How many unread emails do I have?
 ```
 
 ```text
-Show my latest emails.
+Show my latest 5 emails.
 ```
 
 ```text
 Summarize my latest email.
 ```
 
----
-
-### Search Questions
-
 ```text
 Find emails from Google.
-```
-
-```text
-Find emails from HDFC Bank.
 ```
 
 ```text
@@ -1134,608 +851,291 @@ Find unread emails.
 ```
 
 ```text
-Find emails with invoices.
+Find emails from HDFC Bank.
 ```
 
 ```text
-Find emails with attachments.
+Find emails containing invoices.
 ```
 
 ```text
-Find emails received in the last 7 days.
+Show emails with attachments.
+```
+
+```text
+What action items are present in my emails?
+```
+
+```text
+What are the high-priority action items?
+```
+
+```text
+Are there any upcoming deadlines?
+```
+
+```text
+Are there any meetings mentioned in my emails?
+```
+
+```text
+Find unread emails from Google and summarize them.
 ```
 
 ---
 
-### Email Analysis
-
-```text
-Summarize my unread emails.
-```
-
-```text
-What action items do I have?
-```
-
-```text
-What are my high-priority actions?
-```
-
-```text
-Are there any deadlines in my emails?
-```
-
-```text
-Do I have any upcoming meetings?
-```
-
----
-
-### Conversational Questions
-
-```text
-Find my HDFC emails.
-```
-
-Then:
-
-```text
-Which ones are important?
-```
-
-Then:
-
-```text
-Are there any actions I need to take?
-```
-
-This demonstrates the conversation-memory capability.
-
----
-
-# 🔄 Example Agent Execution
-
-Example:
+# 📊 Example User Interaction
 
 ```text
 User:
-Find unread emails from HDFC Bank.
+Find unread emails from Google.
+
+AI Gmail Assistant:
+I found 3 unread emails from Google.
+
+1. Security Alert
+2. Account Notification
+3. Google Account Update
 ```
 
-The agent determines:
+Another example:
 
 ```text
-search_gmail
-```
+User:
+What are the high-priority actions in my emails?
 
-with:
+AI Gmail Assistant:
+I found the following high-priority action:
 
-```text
-from:hdfcbank is:unread
-```
-
-The tool calls Gmail API.
-
-Gmail returns matching messages.
-
-The results are passed back to the agent.
-
-GPT-4o-mini generates:
-
-```text
-I found 3 unread emails from HDFC Bank.
-
-1. Important Update on your HDFC Bank Account
-2. Limited Time Personal Loan Offer
-3. Your Monthly Statement
+1. Review the HDFC Bank offer before the limited-time period expires.
 ```
 
 ---
 
-# 🧠 Example Action Item Flow
+# 🧱 Technology Stack
+
+| Technology         | Purpose                      |
+| ------------------ | ---------------------------- |
+| Python             | Application development      |
+| OpenAI GPT-4o-mini | LLM / reasoning              |
+| LangChain          | LLM and tool integration     |
+| LangGraph          | Agent workflow orchestration |
+| Gmail API          | Gmail access                 |
+| Google OAuth 2.0   | Authentication               |
+| MCP                | Tool/context integration     |
+| Streamlit          | User interface               |
+| Pydantic           | Data validation              |
+| Tiktoken           | Token handling               |
+| Python-dotenv      | Environment configuration    |
+
+---
+
+# 🔄 Production-Oriented Architecture
+
+The current project is designed with separation of responsibilities:
 
 ```text
-User
- │
- │ "What action items do I have?"
- ▼
-LangGraph Agent
- │
- ▼
-extract_action_items
- │
- ▼
-GmailService
- │
- ▼
-Retrieve Emails
- │
- ▼
-GPT-4o-mini
- │
- ▼
-Analyze Email Content
- │
- ▼
-Action Items
- │
- ▼
+Presentation Layer
+        │
+        ▼
+Streamlit UI
+        │
+        ▼
+Agent Layer
+        │
+        ▼
 LangGraph
- │
- ▼
-Final Response
+        │
+        ▼
+LLM Layer
+        │
+        ▼
+Tool Layer
+        │
+        ▼
+Service Layer
+        │
+        ▼
+Gmail API
 ```
 
-Example:
-
-```text
-ACTION ITEMS
-
-1. Complete a short form to indicate job preferences
-   Sender: IBM Talent Acquisition
-   Priority: Medium
-
-2. Review the personal loan offer
-   Sender: HDFC Bank
-   Priority: High
-```
+This separation makes the application easier to maintain and extend.
 
 ---
 
-# 🏆 Key Features
+# 🚀 Future Enhancements
 
-* Gmail API integration
-* OAuth 2.0 authentication
-* GPT-4o-mini integration
-* LangChain tools
-* LangGraph agent workflow
-* Tool calling
-* Gmail search operators
-* Natural-language email search
-* Email summarization
-* Unread email analysis
-* Action-item extraction
-* Deadline detection
-* Meeting detection
-* Priority analysis
-* Conversation memory
-* Thread-based conversations
-* Streamlit UI
-* Quick actions
-* New conversation support
-* Modular architecture
-* Component-level testing
+Potential future improvements include:
 
----
-
-# 🧰 Technology Stack
-
-| Technology         | Purpose                             |
-| ------------------ | ----------------------------------- |
-| Python             | Application development             |
-| OpenAI GPT-4o-mini | LLM                                 |
-| LangChain          | LLM and tool integration            |
-| LangGraph          | Agent workflow and state management |
-| Gmail API          | Gmail access                        |
-| Google OAuth 2.0   | Authentication                      |
-| Streamlit          | Web UI                              |
-| MCP                | Model Context Protocol integration  |
-| Pydantic           | Data validation                     |
-| Tiktoken           | Token processing                    |
-| Pandas             | Data processing                     |
+* Email sending through AI
+* Email reply generation
+* Draft email creation
+* Email categorization
+* Automatic priority classification
+* Attachment analysis
+* PDF/document extraction from attachments
+* Calendar integration
+* Meeting scheduling
+* Gmail label management
+* Email archiving
+* Email deletion with confirmation
+* Redis-based caching
+* Async Gmail processing
+* Background task processing
+* Observability and logging
+* LLM evaluation
+* Prompt versioning
+* Production deployment using Docker
+* Cloud deployment
+* Role-based access control
+* Enterprise authentication
 
 ---
 
 # 🔒 Security Considerations
 
-Sensitive information should never be committed to GitHub.
+The application handles sensitive email information, so security is important.
 
-The following files are excluded:
+Important practices:
 
-```text
-credentials/
-credentials.json
-token.json
-token.pickle
-.env
-.env.*
-*.key
-*.pem
-```
-
-API keys should be stored using environment variables or a secure secret-management solution.
-
-For production deployment, additional security measures should be implemented, including:
-
-* Secret management
-* OAuth token encryption
-* Access control
-* Audit logging
-* Least-privilege Gmail scopes
-* Secure deployment configuration
-* Rate limiting
-* Monitoring
+* Never commit OAuth credentials.
+* Never commit API keys.
+* Never expose `token.json`.
+* Use environment variables for secrets.
+* Use least-privilege Gmail scopes.
+* Validate tool inputs.
+* Avoid exposing sensitive email content in logs.
+* Implement confirmation before destructive Gmail operations.
+* Apply authentication and authorization for production deployments.
 
 ---
 
-# 📈 Production Improvements
+# 📈 Scalability Considerations
 
-The current project provides a strong foundation for an Agentic AI Gmail assistant.
-
-Potential future enhancements include:
-
-### 1. Email Classification
-
-Automatically classify emails:
+For production deployment, the architecture can be extended with:
 
 ```text
-Important
-Promotional
-Financial
-Work
-Personal
-Security
-Newsletter
+Load Balancer
+      │
+      ▼
+Multiple Streamlit / API Instances
+      │
+      ▼
+Agent Service
+      │
+      ├── LLM Service
+      │
+      ├── Gmail Service
+      │
+      ├── Redis Cache
+      │
+      └── Task Queue
 ```
 
-### 2. Priority Scoring
-
-Automatically calculate:
-
-```text
-High
-Medium
-Low
-```
-
-priority.
-
-### 3. Smart Inbox
-
-Create an AI-powered inbox:
-
-```text
-🔥 Critical
-⚡ Action Required
-📅 Upcoming
-📢 Notifications
-📰 Newsletters
-💰 Financial
-```
-
-### 4. Email Draft Generation
-
-Allow the assistant to generate email replies.
-
-Example:
-
-```text
-Reply to this email professionally.
-```
-
-### 5. Calendar Integration
-
-Integrate Google Calendar to identify meetings and deadlines.
-
-### 6. Background Processing
-
-Process large numbers of emails asynchronously.
-
-### 7. Caching
-
-Use Redis or another caching layer to reduce repeated Gmail API calls.
-
-### 8. Observability
-
-Add:
-
-* Structured logging
-* Metrics
-* Tracing
-* Error monitoring
-* Agent execution monitoring
-
-### 9. Deployment
-
-Potential deployment architecture:
-
-```text
-                    Internet
-                       │
-                       ▼
-                 Load Balancer
-                       │
-             ┌─────────┴─────────┐
-             ▼                   ▼
-        Streamlit App       Streamlit App
-             │                   │
-             └─────────┬─────────┘
-                       ▼
-                 Agent Service
-                       │
-          ┌────────────┼────────────┐
-          ▼            ▼            ▼
-       Gmail API    OpenAI API    Cache
-```
+For large-scale implementations, asynchronous processing and caching can reduce latency and API usage.
 
 ---
 
-# ⚠️ Important Limitations
+# 🎯 Key Learning Outcomes
 
-This project currently focuses primarily on Gmail reading, searching, summarization, and analysis.
+This project demonstrates practical experience with:
 
-The assistant does not automatically:
-
-* Send emails
-* Delete emails
-* Modify emails
-* Move emails
-* Mark emails as read
-* Create calendar events
-
-unless those capabilities are explicitly implemented and authorized.
-
-This is intentional because Gmail write operations require additional safety controls and OAuth permissions.
-
----
-
-# 📊 Project Architecture Summary
-
-```text
-┌──────────────────────────────────────────────────────────────┐
-│                         USER                                 │
-└────────────────────────────┬─────────────────────────────────┘
-                             │
-                             ▼
-┌──────────────────────────────────────────────────────────────┐
-│                      STREAMLIT UI                            │
-│                                                              │
-│ Chat │ Quick Actions │ Gmail Statistics │ New Conversation │
-└────────────────────────────┬─────────────────────────────────┘
-                             │
-                             ▼
-┌──────────────────────────────────────────────────────────────┐
-│                       LANGGRAPH                              │
-│                                                              │
-│                    ┌──────────────┐                          │
-│                    │   Chatbot    │                          │
-│                    │     Node     │                          │
-│                    └──────┬───────┘                          │
-│                           │                                   │
-│                    Tool Required?                            │
-│                       /        \                              │
-│                      /          \                             │
-│                    No            Yes                          │
-│                    │              │                           │
-│                    ▼              ▼                           │
-│                   END        ┌──────────┐                     │
-│                              │ ToolNode │                     │
-│                              └────┬─────┘                     │
-│                                   │                           │
-│                                   ▼                           │
-│                               Chatbot                         │
-└────────────────────────────────┬─────────────────────────────┘
-                                 │
-                ┌────────────────┼─────────────────┐
-                │                │                 │
-                ▼                ▼                 ▼
-        Gmail Search       Email Summary     Email Analysis
-                │                │                 │
-                └────────────────┼─────────────────┘
-                                 │
-                                 ▼
-                        ┌─────────────────┐
-                        │  Gmail Service  │
-                        └────────┬────────┘
-                                 │
-                                 ▼
-                        ┌─────────────────┐
-                        │    Gmail API    │
-                        └─────────────────┘
-
-                                 ▲
-                                 │
-                        ┌─────────────────┐
-                        │   GPT-4o-mini   │
-                        │                 │
-                        │ Tool Selection  │
-                        │ Summarization   │
-                        │ Analysis        │
-                        └─────────────────┘
-```
+* Generative AI
+* LLM application development
+* Agentic AI
+* Function / Tool Calling
+* LangChain
+* LangGraph
+* Gmail API integration
+* OAuth 2.0
+* Prompt Engineering
+* Email summarization
+* Information extraction
+* Natural-language search
+* Conversation memory
+* MCP concepts
+* Streamlit application development
+* Modular Python architecture
+* API integration
+* AI application testing
 
 ---
 
-# 🧑‍💻 Development Approach
+# 👨‍💻 Project Highlights
 
-The project was developed incrementally.
-
-### Phase 1 — Gmail Authentication
+The project demonstrates an end-to-end Agentic AI workflow:
 
 ```text
-Google OAuth
-     ↓
-Gmail API Connection
+Natural Language
+       ↓
+LLM Reasoning
+       ↓
+Tool Selection
+       ↓
+Gmail API
+       ↓
+Email Retrieval
+       ↓
+Email Analysis
+       ↓
+LLM Response
+       ↓
+User
 ```
 
-### Phase 2 — Gmail Operations
-
-```text
-Profile
-Unread Count
-Recent Emails
-Full Email
-Search
-```
-
-### Phase 3 — AI Processing
-
-```text
-Email Summarization
-Unread Email Summarization
-Action Item Extraction
-Deadline Extraction
-Priority Analysis
-```
-
-### Phase 4 — LangChain Tools
-
-Gmail operations were exposed as tools.
-
-```text
-Gmail Service
-     ↓
-LangChain Tools
-     ↓
-LLM
-```
-
-### Phase 5 — LangGraph Agent
-
-The tools were connected to a LangGraph workflow.
-
-```text
-Chatbot
-   ↓
-Tool Decision
-   ↓
-Tool
-   ↓
-Chatbot
-```
-
-### Phase 6 — Advanced Search
-
-Natural-language Gmail search was implemented using Gmail search operators.
-
-### Phase 7 — Conversation Memory
-
-Thread-based conversation state was introduced using LangGraph checkpointing.
-
-### Phase 8 — Streamlit Integration
-
-The complete AI Gmail assistant was integrated into a Streamlit UI.
+The main objective is to demonstrate how an LLM can interact with real-world external systems through controlled tools instead of simply generating text.
 
 ---
 
-# 🧪 Current Project Status
+# 📌 Project Status
 
-```text
-✅ Gmail OAuth Authentication
-✅ Gmail API Integration
-✅ Gmail Profile
-✅ Unread Email Count
-✅ Recent Email Retrieval
-✅ Full Email Retrieval
-✅ Gmail Search
-✅ Gmail Search Operators
-✅ LangChain Tools
-✅ GPT-4o-mini Integration
-✅ Email Summarization
-✅ Unread Email Summarization
-✅ Action Item Extraction
-✅ Deadline/Meeting Extraction
-✅ Priority Analysis
-✅ LangGraph Agent
-✅ Tool Calling
-✅ Agent Search Loop
-✅ Conversation Memory
-✅ Thread IDs
-✅ New Conversation
-✅ Streamlit UI
-✅ Quick Actions
-✅ Component Testing
-✅ requirements.txt
-✅ .gitignore
-```
+Current capabilities:
+
+* ✅ Gmail OAuth authentication
+* ✅ Gmail profile information
+* ✅ Unread email count
+* ✅ Recent email retrieval
+* ✅ Full email retrieval
+* ✅ Gmail search
+* ✅ Natural-language Gmail search
+* ✅ Email summarization
+* ✅ Unread email summarization
+* ✅ Action item extraction
+* ✅ Deadline and meeting extraction
+* ✅ Priority analysis
+* ✅ LangChain tools
+* ✅ LangGraph agent workflow
+* ✅ Tool calling
+* ✅ Conversation memory
+* ✅ Thread-based conversations
+* ✅ Streamlit UI
+* ✅ New conversation support
+* ✅ Modular project architecture
+* ✅ Dependency version locking
 
 ---
 
-# 📌 Future Roadmap
+# 📄 License
 
-```text
-⬜ Email Reply Generation
-⬜ Email Sending
-⬜ Email Draft Creation
-⬜ Gmail Labels
-⬜ Email Classification
-⬜ Calendar Integration
-⬜ Redis Caching
-⬜ Async Gmail Processing
-⬜ Background Workers
-⬜ Production Authentication
-⬜ Monitoring
-⬜ Tracing
-⬜ Evaluation Framework
-⬜ Docker Deployment
-⬜ Cloud Deployment
-```
+This project is intended for learning, demonstration, and portfolio purposes.
 
 ---
 
-# 👨‍💻 Author
+# ⭐ Author
 
 **Nagaraj Kamale**
 
-Generative AI Engineer
+Generative AI Engineer | Machine Learning Engineer
 
-Areas of interest:
+Focused on:
 
 * Generative AI
 * LLM Applications
-* Agentic AI
 * RAG
+* Agentic AI
 * LangChain
 * LangGraph
-* Prompt Engineering
-* NLP
+* Python
 * Machine Learning
-* AI Application Development
 
----
-
-# ⭐ Project Highlights
-
-This project demonstrates practical implementation of:
-
-```text
-LLM
- ↓
-Tool Calling
- ↓
-Agentic AI
- ↓
-LangGraph
- ↓
-Gmail API
- ↓
-Email Analysis
- ↓
-Conversation Memory
- ↓
-Streamlit
-```
-
-It is designed as a practical example of how an LLM can interact with external APIs through tools and make decisions dynamically rather than simply generating text.
-
----
-
-# 📜 License
-
-This project is intended for educational, learning, and portfolio purposes.
-
-Before deploying the application in a production environment, ensure that Gmail API usage, OAuth scopes, OpenAI API usage, privacy requirements, and organizational security policies are properly reviewed.
-
-````
-
-### One important GitHub note
-
-Before pushing, keep these **out of GitHub**:
-
-```text
-credentials/credentials.json
-credentials/token.json
-.env
-API keys
-OAuth tokens
 ````
