@@ -1,5 +1,8 @@
 # 📧 AI Gmail Assistant
 
+![Uploading image.png…]()
+
+
 ### 🤖 An Agentic AI-powered Gmail Assistant for intelligent email search, summarization, and analysis
 
 The **AI Gmail Assistant** is a Generative AI application that allows users to interact with their Gmail inbox using **natural language**.
