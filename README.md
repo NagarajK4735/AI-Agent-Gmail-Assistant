@@ -1,6 +1,7 @@
 # 📧 AI Gmail Assistant
 
-![Uploading image.png…]()
+<img width="1908" height="920" alt="Screenshot 2026-08-10 122227" src="https://github.com/user-attachments/assets/19a7c64a-af85-493a-b832-a00f9344bc04" />
+
 
 
 ### 🤖 An Agentic AI-powered Gmail Assistant for intelligent email search, summarization, and analysis
