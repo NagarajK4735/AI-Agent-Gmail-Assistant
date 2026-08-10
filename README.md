@@ -1,4 +1,4 @@
-````markdown
+```markdown
 # 📧 AI Gmail Assistant
 
 ### 🤖 An Agentic AI-powered Gmail Assistant for intelligent email search, summarization, and analysis
@@ -7,7 +7,7 @@ The **AI Gmail Assistant** is a Generative AI application that allows users to i
 
 Instead of manually searching, opening, reading, and analyzing emails, users can simply ask questions and let the AI assistant retrieve and analyze the required information.
 
-The application combines **OpenAI GPT-4o-mini, LangChain, LangGraph, Gmail API, MCP, and Streamlit** to build a tool-enabled Agentic AI system.
+The application combines **OpenAI GPT-4o-mini**, **LangChain**, **LangGraph**, **Gmail API**, **MCP**, and **Streamlit** to build a tool-enabled Agentic AI system.
 
 ---
 
@@ -46,7 +46,6 @@ Understand Information
 Identify Important Actions
      ↓
 Make a Decision
-````
 
 The **AI Gmail Assistant** simplifies this process by providing an AI-powered interface over Gmail.
 
