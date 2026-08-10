@@ -1739,7 +1739,3 @@ credentials/token.json
 API keys
 OAuth tokens
 ````
-
-Your current `.gitignore` already covers the Gmail credentials directory, so **do not remove that rule**.
-
-For your GitHub repository, I would also recommend that the repository contain the **README + source code + `requirements.txt` + `.gitignore`**, while the actual Gmail OAuth credentials remain only on your local machine.
