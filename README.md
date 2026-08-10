@@ -1,43 +1,33 @@
-````markdown
-# 📧 AI Gmail Assistant
+📧 AI Gmail Assistant
+🤖 An Agentic AI-powered Gmail Assistant for intelligent email search, summarization, and analysis
 
-### 🤖 An Agentic AI-powered Gmail Assistant for intelligent email search, summarization, and analysis
-
-The **AI Gmail Assistant** is a Generative AI application that allows users to interact with their Gmail inbox using **natural language**.
+The AI Gmail Assistant is a Generative AI application that allows users to interact with their Gmail inbox using natural language.
 
 Instead of manually searching, opening, reading, and analyzing emails, users can simply ask questions and let the AI assistant retrieve and analyze the required information.
 
-The application combines **Python, OpenAI GPT-4o-mini, LangChain, LangGraph, Gmail API, MCP, Google OAuth 2.0, and Streamlit** to build a tool-enabled Agentic AI system.
+The application combines Python, OpenAI GPT-4o-mini, LangChain, LangGraph, Gmail API, MCP, Google OAuth 2.0, and Streamlit to build a tool-enabled Agentic AI system.
 
----
-
-## ✨ Key Features
-
-| Feature | Description |
-|---|---|
-| 📬 Unread Email Count | Get the number of unread emails |
-| 📩 Recent Emails | Retrieve the latest emails from Gmail |
-| 🔍 Gmail Search | Search emails using Gmail search operators |
-| 🧠 Email Summarization | Generate concise summaries of emails |
-| 📋 Action Item Extraction | Identify tasks that may require user action |
-| ⏰ Deadline Detection | Identify deadlines and time-sensitive activities |
-| 📅 Meeting Detection | Identify meetings mentioned in emails |
-| ⭐ Priority Analysis | Identify high-priority actions |
-| 💬 Conversation Memory | Maintain context across conversations |
-| 🔐 Gmail OAuth | Authenticate securely with Gmail |
-| 🤖 Tool Calling | Automatically select the appropriate Gmail tool |
-| 🔄 LangGraph Workflow | Orchestrate agent and tool execution |
-| 🖥️ Streamlit UI | Interactive chat-based user interface |
-| 🆕 New Conversation | Start a fresh conversation with a new thread |
-| 🔎 Natural-Language Search | Search Gmail using natural-language requests |
-
----
-
-## 🚀 Project Overview
+✨ Key Features
+Feature	Description
+📬 Unread Email Count	Get the number of unread emails
+📩 Recent Emails	Retrieve the latest emails from Gmail
+🔍 Gmail Search	Search emails using Gmail search operators
+🧠 Email Summarization	Generate concise summaries of emails
+📋 Action Item Extraction	Identify tasks that may require user action
+⏰ Deadline Detection	Identify deadlines and time-sensitive activities
+📅 Meeting Detection	Identify meetings mentioned in emails
+⭐ Priority Analysis	Identify high-priority actions
+💬 Conversation Memory	Maintain context across conversations
+🔐 Gmail OAuth	Authenticate securely with Gmail
+🤖 Tool Calling	Automatically select the appropriate Gmail tool
+🔄 LangGraph Workflow	Orchestrate agent and tool execution
+🖥️ Streamlit UI	Interactive chat-based user interface
+🆕 New Conversation	Start a fresh conversation with a new thread
+🔎 Natural-Language Search	Search Gmail using natural-language requests
+🚀 Project Overview
 
 Traditional email applications require users to manually perform multiple steps:
 
-```text
 Search Email
      ↓
 Open Email
@@ -49,7 +39,6 @@ Understand Information
 Identify Important Actions
      ↓
 Make a Decision
-````
 
 The **AI Gmail Assistant** simplifies this process by providing an AI-powered interface over Gmail.
 
