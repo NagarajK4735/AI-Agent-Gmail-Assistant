@@ -1,6 +1,6 @@
 # 📧 AI Gmail Assistant
 
-### 🤖 An Agentic AI-powered Gmail Assistant for Intelligent Email Search, Summarization, and Analysis
+### 🤖 An Agentic AI-powered Gmail Assistant for intelligent email search, summarization, and analysis
 
 The **AI Gmail Assistant** is a Generative AI application that allows users to interact with their Gmail inbox using **natural language**.
 
@@ -57,7 +57,8 @@ The user communicates with the assistant using natural language.
 For example:
 
 ```text
-User: Find unread emails from HDFC Bank.
+User:
+Find unread emails from HDFC Bank.
 ```
 
 The AI agent understands the request, determines which Gmail operation is required, invokes the appropriate tool, retrieves the relevant emails, analyzes the results, and generates a natural-language response.
@@ -218,10 +219,11 @@ Users do not need to manually remember Gmail search operators.
 For example:
 
 ```text
-User: Find unread emails from Google.
+User:
+Find unread emails from Google.
 ```
 
-The agent can translate the intent into a Gmail search query:
+The agent can translate the intent into a Gmail search query such as:
 
 ```text
 from:google is:unread
@@ -440,7 +442,7 @@ The application also provides a **New Conversation** option that creates a new t
 
 ## 🧰 Gmail Tools
 
-The LangGraph agent currently exposes the following Gmail-related tools:
+The LangGraph agent currently exposes Gmail-related tools including:
 
 ```text
 get_unread_email_count
@@ -505,7 +507,7 @@ Gmail API
 
 OAuth credentials are stored locally and are excluded from version control through `.gitignore`.
 
-Sensitive files such as the following should never be committed to GitHub:
+Sensitive files such as:
 
 ```text
 credentials/
@@ -513,6 +515,8 @@ credentials.json
 token.json
 token.pickle
 ```
+
+should not be committed to GitHub.
 
 ---
 
@@ -552,7 +556,7 @@ Used for:
 * Tool execution
 * Conditional routing
 * Conversation state
-* Memory and checkpointing
+* Memory/checkpointing
 
 ### 📧 Gmail API
 
@@ -580,6 +584,8 @@ Model Context Protocol is included in the project architecture as an extensible 
 
 ## 🗂️ Project Structure
 
+The project follows a modular architecture:
+
 ```text
 AI_Gmail_Assistant/
 │
@@ -592,17 +598,13 @@ AI_Gmail_Assistant/
 ├── config/
 │
 ├── credentials/
-│
-├── images/
+│   ├── credentials.json
+│   └── token.json
 │
 ├── mcp_server/
 │
 ├── models/
 │   └── llm.py
-│
-├── prompts/
-│
-├── schemas/
 │
 ├── services/
 │   ├── auth_service.py
@@ -612,15 +614,13 @@ AI_Gmail_Assistant/
 ├── tools/
 │   └── gmail_tools.py
 │
-├── utils/
-│
 ├── app.py
 ├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-> **Note:** The local `credentials/` directory contains OAuth files and should remain excluded from GitHub using `.gitignore`.
+> **Note:** The `images/`, `utils/`, `schemas/`, and `prompts/` folders were removed because they were empty and were not required by the current implementation.
 
 ### Main Components
 
@@ -628,7 +628,7 @@ AI_Gmail_Assistant/
 | ----------------------------- | ------------------------------------------------------------- |
 | `app.py`                      | Streamlit application and chat interface                      |
 | `agents/agent.py`             | Creates the LLM agent and binds tools                         |
-| `agents/graph.py`             | Defines and compiles the LangGraph workflow                   |
+| `agents/graph.py`             | Defines and compiles LangGraph workflow                       |
 | `agents/nodes.py`             | Defines chatbot and tool nodes                                |
 | `agents/state.py`             | Defines agent state                                           |
 | `models/llm.py`               | Configures GPT-4o-mini                                        |
@@ -637,6 +637,7 @@ AI_Gmail_Assistant/
 | `services/summary_service.py` | Handles email summarization                                   |
 | `tools/gmail_tools.py`        | Exposes Gmail operations as LangChain tools                   |
 | `mcp_server/`                 | MCP-related project components                                |
+| `credentials/`                | Local Gmail OAuth credentials                                 |
 | `requirements.txt`            | Python dependencies                                           |
 | `.gitignore`                  | Prevents sensitive and unnecessary files from being committed |
 
@@ -656,7 +657,7 @@ AI_Gmail_Assistant/
 │  • Chat Interface                            │
 │  • Quick Actions                             │
 │  • Gmail Statistics                          │
-│  • Conversation Management                   │
+│  • Conversation Management                  │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -666,7 +667,7 @@ AI_Gmail_Assistant/
 │  • Agent State                               │
 │  • Conditional Routing                       │
 │  • Tool Execution                            │
-│  • Conversation Memory                      │
+│  • Conversation Memory                       │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -695,11 +696,11 @@ AI_Gmail_Assistant/
 ┌──────────────────────────────────────────────┐
 │              Gmail Service                   │
 │                                              │
-│  • Authentication                            │
-│  • Email Retrieval                            │
-│  • Search                                    │
-│  • Header Extraction                          │
-│  • Body Extraction                            │
+│  Authentication                              │
+│  Email Retrieval                             │
+│  Search                                      │
+│  Header Extraction                           │
+│  Body Extraction                             │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -708,14 +709,14 @@ AI_Gmail_Assistant/
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
-                  📧 Gmail Inbox
+                📧 Gmail Inbox
 ```
 
 ---
 
 ## 🧪 Testing
 
-The project includes test scripts for validating individual components and the complete agent workflow.
+The project includes multiple test scripts for validating individual components and the complete agent workflow.
 
 Examples include:
 
@@ -938,7 +939,7 @@ cd AI_Gmail_Assistant
 
 ### 2. Create a Virtual Environment
 
-For Windows:
+Windows:
 
 ```powershell
 python -m venv gmail_ai_agent
@@ -952,15 +953,15 @@ gmail_ai_agent\Scripts\activate
 
 ### 3. Install Dependencies
 
-```bash
+```powershell
 pip install -r requirements.txt
 ```
 
-### 4. Configure OpenAI API Key
+### 4. Configure Environment Variables
 
 Set the OpenAI API key in your environment.
 
-For Windows PowerShell:
+For example, on Windows PowerShell:
 
 ```powershell
 $env:OPENAI_API_KEY="your-api-key"
@@ -976,7 +977,9 @@ The application uses Google OAuth to authenticate the Gmail account.
 
 ### 6. Run the Application
 
-```bash
+Start Streamlit using:
+
+```powershell
 streamlit run app.py
 ```
 
@@ -1002,7 +1005,7 @@ Example interface flow:
 
 ```text
 ┌────────────────────────────────────────────┐
-│ 📧 AI Gmail Assistant                      │
+│ 📧 AI Gmail Assistant                     │
 ├────────────────────────────────────────────┤
 │                                            │
 │ 👤 Find unread emails from Google.         │
