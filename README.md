@@ -1,33 +1,42 @@
-📧 AI Gmail Assistant
-🤖 An Agentic AI-powered Gmail Assistant for intelligent email search, summarization, and analysis
+# 📧 AI Gmail Assistant
 
-The AI Gmail Assistant is a Generative AI application that allows users to interact with their Gmail inbox using natural language.
+### 🤖 An Agentic AI-powered Gmail Assistant for Intelligent Email Search, Summarization, and Analysis
+
+The **AI Gmail Assistant** is a Generative AI application that allows users to interact with their Gmail inbox using **natural language**.
 
 Instead of manually searching, opening, reading, and analyzing emails, users can simply ask questions and let the AI assistant retrieve and analyze the required information.
 
-The application combines Python, OpenAI GPT-4o-mini, LangChain, LangGraph, Gmail API, MCP, Google OAuth 2.0, and Streamlit to build a tool-enabled Agentic AI system.
+The application combines **Python, OpenAI GPT-4o-mini, LangChain, LangGraph, Gmail API, MCP, Google OAuth 2.0, and Streamlit** to build a tool-enabled Agentic AI system.
 
-✨ Key Features
-Feature	Description
-📬 Unread Email Count	Get the number of unread emails
-📩 Recent Emails	Retrieve the latest emails from Gmail
-🔍 Gmail Search	Search emails using Gmail search operators
-🧠 Email Summarization	Generate concise summaries of emails
-📋 Action Item Extraction	Identify tasks that may require user action
-⏰ Deadline Detection	Identify deadlines and time-sensitive activities
-📅 Meeting Detection	Identify meetings mentioned in emails
-⭐ Priority Analysis	Identify high-priority actions
-💬 Conversation Memory	Maintain context across conversations
-🔐 Gmail OAuth	Authenticate securely with Gmail
-🤖 Tool Calling	Automatically select the appropriate Gmail tool
-🔄 LangGraph Workflow	Orchestrate agent and tool execution
-🖥️ Streamlit UI	Interactive chat-based user interface
-🆕 New Conversation	Start a fresh conversation with a new thread
-🔎 Natural-Language Search	Search Gmail using natural-language requests
-🚀 Project Overview
+---
+
+## ✨ Key Features
+
+| Feature                    | Description                                      |
+| -------------------------- | ------------------------------------------------ |
+| 📬 Unread Email Count      | Get the number of unread emails                  |
+| 📩 Recent Emails           | Retrieve the latest emails from Gmail            |
+| 🔍 Gmail Search            | Search emails using Gmail search operators       |
+| 🧠 Email Summarization     | Generate concise summaries of emails             |
+| 📋 Action Item Extraction  | Identify tasks that may require user action      |
+| ⏰ Deadline Detection       | Identify deadlines and time-sensitive activities |
+| 📅 Meeting Detection       | Identify meetings mentioned in emails            |
+| ⭐ Priority Analysis        | Identify high-priority actions                   |
+| 💬 Conversation Memory     | Maintain context across conversations            |
+| 🔐 Gmail OAuth             | Authenticate securely with Gmail                 |
+| 🤖 Tool Calling            | Automatically select the appropriate Gmail tool  |
+| 🔄 LangGraph Workflow      | Orchestrate agent and tool execution             |
+| 🖥️ Streamlit UI           | Interactive chat-based user interface            |
+| 🆕 New Conversation        | Start a fresh conversation with a new thread     |
+| 🔎 Natural-Language Search | Search Gmail using natural-language requests     |
+
+---
+
+## 🚀 Project Overview
 
 Traditional email applications require users to manually perform multiple steps:
 
+```text
 Search Email
      ↓
 Open Email
@@ -39,6 +48,7 @@ Understand Information
 Identify Important Actions
      ↓
 Make a Decision
+```
 
 The **AI Gmail Assistant** simplifies this process by providing an AI-powered interface over Gmail.
 
@@ -47,8 +57,7 @@ The user communicates with the assistant using natural language.
 For example:
 
 ```text
-User:
-Find unread emails from HDFC Bank.
+User: Find unread emails from HDFC Bank.
 ```
 
 The AI agent understands the request, determines which Gmail operation is required, invokes the appropriate tool, retrieves the relevant emails, analyzes the results, and generates a natural-language response.
@@ -209,10 +218,10 @@ Users do not need to manually remember Gmail search operators.
 For example:
 
 ```text
-Find unread emails from Google.
+User: Find unread emails from Google.
 ```
 
-The agent can translate the intent into a Gmail search query such as:
+The agent can translate the intent into a Gmail search query:
 
 ```text
 from:google is:unread
@@ -431,7 +440,7 @@ The application also provides a **New Conversation** option that creates a new t
 
 ## 🧰 Gmail Tools
 
-The LangGraph agent currently exposes Gmail-related tools including:
+The LangGraph agent currently exposes the following Gmail-related tools:
 
 ```text
 get_unread_email_count
@@ -496,7 +505,7 @@ Gmail API
 
 OAuth credentials are stored locally and are excluded from version control through `.gitignore`.
 
-Sensitive files such as the following should not be committed to GitHub:
+Sensitive files such as the following should never be committed to GitHub:
 
 ```text
 credentials/
@@ -571,8 +580,6 @@ Model Context Protocol is included in the project architecture as an extensible 
 
 ## 🗂️ Project Structure
 
-The project follows a modular architecture:
-
 ```text
 AI_Gmail_Assistant/
 │
@@ -585,8 +592,6 @@ AI_Gmail_Assistant/
 ├── config/
 │
 ├── credentials/
-│   ├── credentials.json       # Local only - not committed
-│   └── token.json             # Local only - not committed
 │
 ├── images/
 │
@@ -609,35 +614,15 @@ AI_Gmail_Assistant/
 │
 ├── utils/
 │
-├── tests/
-│   ├── test_auth.py
-│   ├── test_search.py
-│   ├── test_search_tool.py
-│   ├── test_search_full.py
-│   ├── test_agent.py
-│   ├── test_agent_search.py
-│   ├── test_agent_search_loop.py
-│   ├── test_graph_search.py
-│   ├── test_action_items.py
-│   ├── test_action_tool.py
-│   ├── test_deadlines.py
-│   ├── test_deadlines_tool.py
-│   ├── test_email_analysis.py
-│   ├── test_memory.py
-│   ├── test_graph_memory_action.py
-│   └── test_multi_tool.py
-│
 ├── app.py
 ├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-> **Note:** `credentials/` is used locally for Gmail OAuth files and should remain excluded from GitHub through `.gitignore`.
+> **Note:** The local `credentials/` directory contains OAuth files and should remain excluded from GitHub using `.gitignore`.
 
----
-
-## 📁 Main Components
+### Main Components
 
 | Component                     | Responsibility                                                |
 | ----------------------------- | ------------------------------------------------------------- |
@@ -652,7 +637,6 @@ AI_Gmail_Assistant/
 | `services/summary_service.py` | Handles email summarization                                   |
 | `tools/gmail_tools.py`        | Exposes Gmail operations as LangChain tools                   |
 | `mcp_server/`                 | MCP-related project components                                |
-| `tests/`                      | Functional and workflow testing scripts                       |
 | `requirements.txt`            | Python dependencies                                           |
 | `.gitignore`                  | Prevents sensitive and unnecessary files from being committed |
 
@@ -682,7 +666,7 @@ AI_Gmail_Assistant/
 │  • Agent State                               │
 │  • Conditional Routing                       │
 │  • Tool Execution                            │
-│  • Conversation Memory                       │
+│  • Conversation Memory                      │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -731,7 +715,27 @@ AI_Gmail_Assistant/
 
 ## 🧪 Testing
 
-The project contains a dedicated `tests/` directory for validating individual services, tools, agent behavior, LangGraph workflows, and conversation memory.
+The project includes test scripts for validating individual components and the complete agent workflow.
+
+Examples include:
+
+```text
+test_auth.py
+test_search.py
+test_search_tool.py
+test_search_full.py
+test_agent_search.py
+test_agent_search_loop.py
+test_graph_search.py
+test_action_items.py
+test_action_tool.py
+test_deadlines.py
+test_deadlines_tool.py
+test_email_analysis.py
+test_memory.py
+test_graph_memory_action.py
+test_multi_tool.py
+```
 
 The testing approach validates functionality progressively:
 
@@ -747,27 +751,6 @@ LangGraph Workflow
 Memory / Checkpointing
        ↓
 Streamlit Application
-```
-
-Examples of test coverage include:
-
-```text
-test_auth.py
-test_search.py
-test_search_tool.py
-test_search_full.py
-test_agent.py
-test_agent_search.py
-test_agent_search_loop.py
-test_graph_search.py
-test_action_items.py
-test_action_tool.py
-test_deadlines.py
-test_deadlines_tool.py
-test_email_analysis.py
-test_memory.py
-test_graph_memory_action.py
-test_multi_tool.py
 ```
 
 ---
@@ -961,7 +944,7 @@ For Windows:
 python -m venv gmail_ai_agent
 ```
 
-Activate the environment:
+Activate it:
 
 ```powershell
 gmail_ai_agent\Scripts\activate
@@ -969,7 +952,7 @@ gmail_ai_agent\Scripts\activate
 
 ### 3. Install Dependencies
 
-```powershell
+```bash
 pip install -r requirements.txt
 ```
 
@@ -991,18 +974,9 @@ Place the required Gmail OAuth configuration inside the local `credentials/` dir
 
 The application uses Google OAuth to authenticate the Gmail account.
 
-Keep the following files local and never commit them:
-
-```text
-credentials/credentials.json
-credentials/token.json
-```
-
 ### 6. Run the Application
 
-Start Streamlit using:
-
-```powershell
+```bash
 streamlit run app.py
 ```
 
@@ -1015,7 +989,7 @@ The application will open in the browser.
 The Streamlit interface provides:
 
 * Gmail account information
-* Gmail connection status
+* Connection status
 * Unread email count
 * Total email count
 * Gmail thread count
@@ -1137,6 +1111,3 @@ Generative AI Engineer | Python | LLMs | RAG | Agentic AI | LangChain | LangGrap
 ---
 
 ⭐ If you find this project useful, consider giving the repository a star.
-
-```
-```
